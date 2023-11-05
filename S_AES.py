@@ -30,11 +30,12 @@ class S_ASE(object):
             for j in range(2):
                 start_index = 8 * i + 4 * j
                 nibble = bitstring[start_index:start_index + 4]
-                nibble_matrix[i][j] = int(nibble, 2)
+                nibble_matrix[j][i] = int(nibble, 2)
 
         return nibble_matrix
 
     def Add_Key(self, key, nibble_matrix):
+        # print(nibble_matrix)
         # 执行逐半字节异或操作
         s00 = nibble_matrix[0][0] ^ self.to_nibble_matrix(key)[0][0]
         s01 = nibble_matrix[0][1] ^ self.to_nibble_matrix(key)[0][1]
@@ -44,6 +45,7 @@ class S_ASE(object):
         return [[s00, s01], [s10, s11]]
 
     def Nibble_Substitution(self, nibble_matrix, inv=False):
+        # print(nibble_matrix)
         result = [[0, 0], [0, 0]]
         if not inv:
             for i in range(2):
@@ -60,10 +62,12 @@ class S_ASE(object):
         return result
 
     def Shift_Row(self, nibble_matrix):
+        # print(nibble_matrix)
         nibble_matrix[1][0], nibble_matrix[1][1] = nibble_matrix[1][1], nibble_matrix[1][0]
         return nibble_matrix
 
     def Mix_Column(self, nibble_matrix, inv=False):
+        # print(nibble_matrix)
         result = [[0, 0], [0, 0]]
         if not inv:
             result[0][0] = GF2_4_add(nibble_matrix[0][0], GF2_4_multiply(4, nibble_matrix[1][0]))
@@ -95,8 +99,11 @@ class S_ASE(object):
         w3 = w2 ^ w1
         w4 = w2 ^ 0b00110000 ^ SubNib(RotNib(w3))
         w5 = w4 ^ w3
-        self.key1 = bin((w2 << 4) | w3)[2:].zfill(16)
-        self.key2 = bin((w4 << 4) | w5)[2:].zfill(16)
+        # print(w0, w1, w2, w3, w4, w5)
+        self.key1 = bin((w2 << 8) | w3)[2:].zfill(16)
+        # print(self.key1)
+        self.key2 = bin((w4 << 8) | w5)[2:].zfill(16)
+        # print(self.key2)
 
     def to_str(self, nibble_matrix):
         binary_string = ""
@@ -117,8 +124,10 @@ class S_ASE(object):
                                 self.Nibble_Substitution(
                                     self.Add_Key(
                                         self.key0, self.to_nibble_matrix(plain_text))
-                                ))))
-                )))
+                                ))
+                        ))
+                ))
+        )
         return self.to_str(cypher_text)
 
     def decrypt(self, cypher_text):
@@ -140,11 +149,11 @@ class S_ASE(object):
 
 
 if __name__ == '__main__':
-    key = '1010101010101010'
+    key = '0010110101010101'
     print(f'key = {key}')
     S_ASE = S_ASE(key)
 
-    plain_text = '1111111111111111'
+    plain_text = '1010011101001001'
     print(f'plain_text  = {plain_text}')
     cypher_text = S_ASE.encrypt(plain_text)
     print(f'cypher_text = {cypher_text}')
