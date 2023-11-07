@@ -143,33 +143,6 @@ class S_AES(object):
         return self.to_str(plain_text)
 
 
-class two_fold_S_AES(S_AES):
-    def __init__(self, key):
-        key_1 = key[:16]
-        key_2 = key[16:]
-        super().__init__(key_1)
-        self.key3 = key_2
-        self.key4 = None  # 二重AES子密钥
-        self.key5 = None  # 二重AES子密钥
-
-    def two_fold_encrypt(self, plain_text):
-        plain_text = self.encrypt(plain_text)
-        self.key4, self.key5 = self.key_extension(self.key3)
-        cypher_text = self.Add_Key(
-            self.key5, self.Shift_Row(
-                self.Nibble_Substitution(
-                    self.Add_Key(
-                        self.key4, self.Mix_Column(
-                            self.Shift_Row(
-                                self.Nibble_Substitution(
-                                    self.Add_Key(
-                                        self.key3, self.to_nibble_matrix(plain_text))
-                                ))
-                        ))
-                ))
-        )
-        return self.to_str(cypher_text)
-
 
 if __name__ == '__main__':
     key = '0000000011111111'
