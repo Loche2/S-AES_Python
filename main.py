@@ -4,7 +4,7 @@ from qfluentwidgets import FluentIcon
 
 from cracker import Cracker
 from ui_main import Ui_Form
-from S_AES import S_ASE
+from S_AES import S_AES
 from utils import *
 
 
@@ -59,7 +59,7 @@ class Main(QWidget):
             showErrorInfoBar(self, '密钥仅能为16位比特串')
             return
 
-        m_S_ASE = S_ASE(key=key)
+        m_S_ASE = S_AES(key=key)
 
         for two_byte in to_16bits(plain_txt):
             cypher_txt = m_S_ASE.encrypt(two_byte)
@@ -90,7 +90,7 @@ class Main(QWidget):
             showErrorInfoBar(self, '密钥仅能为16位比特串')
             return
 
-        m_S_ASE = S_ASE(key=key)
+        m_S_ASE = S_AES(key=key)
 
         for two_byte in to_16bits(cypher_txt):
             plain_txt = m_S_ASE.decrypt(two_byte)

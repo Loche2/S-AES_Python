@@ -443,34 +443,6 @@ PillToolButton:disabled:checked {
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="PrimaryPushButton" name="pBtn_Encrypt">
-         <property name="text">
-          <string>↓加密↓</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="ComboBox" name="comboBox_Multi_Encrypt">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="PrimaryPushButton" name="pBtn_Decrypt">
-         <property name="text">
-          <string>↑解密↑</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="StrongBodyLabel" name="label_Key">
@@ -498,6 +470,34 @@ PillToolButton:disabled:checked {
          </property>
          <property name="placeholderText">
           <string>16bit</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="PrimaryPushButton" name="pBtn_Encrypt">
+         <property name="text">
+          <string>↓加密↓</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="ComboBox" name="comboBox_Multi_Encrypt">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="PrimaryPushButton" name="pBtn_Decrypt">
+         <property name="text">
+          <string>↑解密↑</string>
          </property>
         </widget>
        </item>

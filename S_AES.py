@@ -2,14 +2,8 @@ from GF_2_4 import *
 
 
 # noinspection PyMethodMayBeStatic
-class S_ASE(object):
+class S_AES(object):
     def __init__(self, key):
-        self.key0 = key
-        self.key1 = None #单重AES子密钥
-        self.key2 = None #单重AES子密钥
-       
-        # self.key5 = None #三重AES子密钥
-        # self.key6 = None #三重AES子密钥
         self.S_Box = [
             [0x9, 0x4, 0xA, 0xB],
             [0xD, 0x1, 0x8, 0x5],
@@ -22,11 +16,11 @@ class S_ASE(object):
             [0x6, 0x0, 0x2, 0x3],
             [0xC, 0x4, 0xD, 0xE]
         ]
+        self.key0 = key
+        self.key1, self.key2 = self.key_extension(key)
 
     def to_nibble_matrix(self, bitstring):
         if len(bitstring) != 16:
-            print(bitstring)
-            print(len(bitstring))
             raise ValueError("输入比特串必须是16位")
 
         nibble_matrix = [[0, 0], [0, 0]]
@@ -86,7 +80,7 @@ class S_ASE(object):
             result[1][1] = GF2_4_add(GF2_4_multiply(2, nibble_matrix[0][1]), GF2_4_multiply(9, nibble_matrix[1][1]))
         return result
 
-    def key_extension(self,key):
+    def key_extension(self, key):
         def RotNib(w):
             N1 = w & 0x0F
             N0 = (w >> 4) & 0x0F
@@ -105,20 +99,18 @@ class S_ASE(object):
         w4 = w2 ^ 0b00110000 ^ SubNib(RotNib(w3))
         w5 = w4 ^ w3
         # print(w0, w1, w2, w3, w4, w5)
-        return bin((w2 << 8) | w3)[2:].zfill(16),bin((w4 << 8) | w5)[2:].zfill(16)
-        # print(self.key1)
-        # print(self.key2)
+        return bin((w2 << 8) | w3)[2:].zfill(16), bin((w4 << 8) | w5)[2:].zfill(16)
 
     def to_str(self, nibble_matrix):
         binary_string = ""
-        for row in nibble_matrix:
-            for element in row:
-                binary_element = bin(element)[2:].zfill(4)
+        columns = len(nibble_matrix[0])
+        for column in range(columns):
+            for row in nibble_matrix:
+                binary_element = bin(row[column])[2:].zfill(4)
                 binary_string += binary_element
         return binary_string
 
     def encrypt(self, plain_text):
-        self.key1,self.key2 = self.key_extension(self.key0)
         cypher_text = self.Add_Key(
             self.key2, self.Shift_Row(
                 self.Nibble_Substitution(
@@ -135,7 +127,6 @@ class S_ASE(object):
         return self.to_str(cypher_text)
 
     def decrypt(self, cypher_text):
-        self.key1,self.key2 = self.key_extension(self.key0)
         plain_text = self.Add_Key(
             self.key0, self.Nibble_Substitution(
                 self.Shift_Row(
@@ -151,17 +142,19 @@ class S_ASE(object):
         )
         return self.to_str(plain_text)
 
-class two_fold_S_AES(S_ASE):
-    def __init__(self,key):
+
+class two_fold_S_AES(S_AES):
+    def __init__(self, key):
         key_1 = key[:16]
         key_2 = key[16:]
         super().__init__(key_1)
         self.key3 = key_2
-        self.key4 = None #二重AES子密钥
-        self.key5 = None #二重AES子密钥
+        self.key4 = None  # 二重AES子密钥
+        self.key5 = None  # 二重AES子密钥
+
     def two_fold_encrypt(self, plain_text):
         plain_text = self.encrypt(plain_text)
-        self.key4,self.key5 = self.key_extension(self.key3)
+        self.key4, self.key5 = self.key_extension(self.key3)
         cypher_text = self.Add_Key(
             self.key5, self.Shift_Row(
                 self.Nibble_Substitution(
@@ -176,17 +169,16 @@ class two_fold_S_AES(S_ASE):
                 ))
         )
         return self.to_str(cypher_text)
-    
+
 
 if __name__ == '__main__':
-    key = '0000000011111111 '
+    key = '0000000011111111'
     print(f'key = {key}')
-    S_AES = S_ASE(key)
-    
+    S_ASE = S_AES(key)
+
     plain_text = '1111111111111111'
-    cypher_text = S_AES.decrypt(plain_text)
-    # print(f'plain_text  = {plain_text}')
-    # cypher_text = S_ASE.encrypt(plain_text)
+    print(f'plain_text  = {plain_text}')
+    cypher_text = S_ASE.encrypt(plain_text)
     print(f'cypher_text = {cypher_text}')
-    # decryption = S_ASE.decrypt(cypher_text)
-    # print(f'decryption  = {decryption}')
+    decryption = S_ASE.decrypt(cypher_text)
+    print(f'decryption  = {decryption}')
