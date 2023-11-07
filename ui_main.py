@@ -446,7 +446,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "S-DES"))
+        Form.setWindowTitle(_translate("Form", "S-AES"))
         self.pBtn_Github.setText(_translate("Form", "项目主页"))
         self.rBtn_Bin.setText(_translate("Form", "Binary"))
         self.rBtn_Str.setText(_translate("Form", "String"))

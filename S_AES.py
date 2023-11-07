@@ -2,7 +2,7 @@ from GF_2_4 import *
 
 
 # noinspection PyMethodMayBeStatic
-class S_AES(object):
+class S_AES:
     def __init__(self, key):
         self.S_Box = [
             [0x9, 0x4, 0xA, 0xB],
@@ -141,7 +141,6 @@ class S_AES(object):
                 ), inv=True)
         )
         return self.to_str(plain_text)
-
 
 
 if __name__ == '__main__':

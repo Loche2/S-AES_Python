@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>S-DES</string>
+   <string>S-AES</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
    <item>
