@@ -2,7 +2,9 @@
 from PyQt5.QtWidgets import *
 from qfluentwidgets import FluentIcon
 
+from CBC import CBC
 from cracker import Cracker
+from two_fold_S_AES import two_fold_S_AES, treble_S_AES
 from ui_main import Ui_Form
 from S_AES import S_AES
 from utils import *
@@ -39,6 +41,7 @@ class Main(QWidget):
         self.ui.pBtn_Encrypt.clicked.connect(self.encrypt)
         self.ui.pBtn_Decrypt.clicked.connect(self.decrypt)
         self.ui.pBtn_Crack.clicked.connect(self.openCracker)
+        self.ui.sBtn_CBC.checkedChanged.connect(self.off_multi)
 
     def encrypt(self):
         self.ui.cypherTextEdit.clear()
@@ -55,15 +58,37 @@ class Main(QWidget):
         if len(plain_txt) % 16 != 0 or not is_bin(plain_txt):
             showErrorInfoBar(self, '明文不是16-bit，请查证后再输入')
             return
-        if len(self.ui.lineEdit_Key.text()) != 16 or not is_bin(self.ui.lineEdit_Key.text()):
-            showErrorInfoBar(self, '密钥仅能为16位比特串')
-            return
 
-        m_S_ASE = S_AES(key=key)
-
-        for two_byte in to_16bits(plain_txt):
-            cypher_txt = m_S_ASE.encrypt(two_byte)
-            self.ui.cypherTextEdit.insertPlainText(cypher_txt)
+        if self.ui.comboBox_Multi_Encrypt.currentText() == '一重加密':
+            if len(self.ui.lineEdit_Key.text()) != 16 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '一重加密时密钥仅能为16位比特串')
+                return
+            if self.ui.sBtn_CBC.isChecked():
+                CBC_S_AES = CBC(key=key)
+                cypher_txt = CBC_S_AES.encrypt(plain_txt)
+                cypher_txt = ''.join(cypher_txt)
+                self.ui.cypherTextEdit.insertPlainText(cypher_txt)
+            else:
+                m_S_AES = S_AES(key=key)
+                for two_byte in to_16bits(plain_txt):
+                    cypher_txt = m_S_AES.encrypt(two_byte)
+                    self.ui.cypherTextEdit.insertPlainText(cypher_txt)
+        elif self.ui.comboBox_Multi_Encrypt.currentText() == '双重加密':
+            if len(self.ui.lineEdit_Key.text()) != 32 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '双重加密时密钥仅能为32位比特串')
+                return
+            double_S_AES = two_fold_S_AES(key=key)
+            for two_byte in to_16bits(plain_txt):
+                cypher_txt = double_S_AES.two_fold_encrypt(two_byte)
+                self.ui.cypherTextEdit.insertPlainText(cypher_txt)
+        elif self.ui.comboBox_Multi_Encrypt.currentText() == '三重加密':
+            if len(self.ui.lineEdit_Key.text()) != 48 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '三重加密时密钥仅能为48位比特串')
+                return
+            triple_S_AES = treble_S_AES(key=key)
+            for two_byte in to_16bits(plain_txt):
+                cypher_txt = triple_S_AES.treble_encrypt(two_byte)
+                self.ui.cypherTextEdit.insertPlainText(cypher_txt)
 
         if self.ui.rBtn_Str.isChecked():
             self.ui.cypherTextEdit.setPlainText(
@@ -86,20 +111,49 @@ class Main(QWidget):
             print(cypher_txt)
             showErrorInfoBar(self, '密文不是16-bit，请查证后再输入')
             return
-        if len(self.ui.lineEdit_Key.text()) != 16 or not is_bin(self.ui.lineEdit_Key.text()):
-            showErrorInfoBar(self, '密钥仅能为16位比特串')
-            return
 
-        m_S_ASE = S_AES(key=key)
-
-        for two_byte in to_16bits(cypher_txt):
-            plain_txt = m_S_ASE.decrypt(two_byte)
-            self.ui.plainTextEdit.insertPlainText(plain_txt)
+        if self.ui.comboBox_Multi_Encrypt.currentText() == '一重加密':
+            if len(self.ui.lineEdit_Key.text()) != 16 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '一重加密时密钥仅能为16位比特串')
+                return
+            if self.ui.sBtn_CBC.isChecked():
+                CBC_S_AES = CBC(key=key)
+                plain_text = CBC_S_AES.decrypt(cypher_txt)
+                plain_text = ''.join(plain_text)
+                self.ui.plainTextEdit.insertPlainText(plain_text)
+            else:
+                m_S_AES = S_AES(key=key)
+                for two_byte in to_16bits(cypher_txt):
+                    plain_text = m_S_AES.decrypt(two_byte)
+                    self.ui.plainTextEdit.insertPlainText(plain_text)
+        elif self.ui.comboBox_Multi_Encrypt.currentText() == '双重加密':
+            if len(self.ui.lineEdit_Key.text()) != 32 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '双重加密时密钥仅能为32位比特串')
+                return
+            double_S_AES = two_fold_S_AES(key=key)
+            for two_byte in to_16bits(cypher_txt):
+                plain_text = double_S_AES.two_fold_decrypt(two_byte)
+                self.ui.plainTextEdit.insertPlainText(plain_text)
+        elif self.ui.comboBox_Multi_Encrypt.currentText() == '三重加密':
+            if len(self.ui.lineEdit_Key.text()) != 48 or not is_bin(self.ui.lineEdit_Key.text()):
+                showErrorInfoBar(self, '三重加密时密钥仅能为48位比特串')
+                return
+            triple_S_AES = treble_S_AES(key=key)
+            for two_byte in to_16bits(cypher_txt):
+                plain_text = triple_S_AES.treble_decrypt(two_byte)
+                self.ui.plainTextEdit.insertPlainText(plain_text)
 
         if self.ui.rBtn_Str.isChecked():
             self.ui.plainTextEdit.setPlainText(
                 asc2str(self.ui.plainTextEdit.toPlainText())
             )
+
+    def off_multi(self):
+        if self.ui.sBtn_CBC.isChecked():
+            self.ui.comboBox_Multi_Encrypt.setCurrentIndex(0)
+            self.ui.comboBox_Multi_Encrypt.setDisabled(True)
+        else:
+            self.ui.comboBox_Multi_Encrypt.setDisabled(False)
 
     def openCracker(self):
         if self.cracker is None:  # 仅当Cracker窗口不存在时创建

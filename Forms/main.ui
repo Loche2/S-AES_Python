@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
+    <width>553</width>
     <height>500</height>
    </rect>
   </property>
@@ -430,6 +430,19 @@ PillToolButton:disabled:checked {
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="SwitchButton" name="sBtn_CBC">
+         <property name="text">
+          <string>CBC mode</string>
+         </property>
+         <property name="onText">
+          <string>CBC mode</string>
+         </property>
+         <property name="offText">
+          <string>CBC mode</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -461,7 +474,7 @@ PillToolButton:disabled:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>200</width>
+           <width>480</width>
            <height>33</height>
           </size>
          </property>
@@ -576,6 +589,11 @@ PillToolButton:disabled:checked {
   <customwidget>
    <class>ToolButton</class>
    <extends>QToolButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SwitchButton</class>
+   <extends>QWidget</extends>
    <header>qfluentwidgets</header>
   </customwidget>
   <customwidget>
