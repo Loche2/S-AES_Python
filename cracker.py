@@ -1,6 +1,9 @@
+import time
+
 from PyQt5.QtWidgets import QWidget, QTableWidget, QTableWidgetItem
 from qfluentwidgets import TeachingTip, InfoBarIcon, TeachingTipTailPosition
 
+from brute_force import meet_in_the_middle_attack
 # from brute_force_attack import main_brute_force_attack
 from ui_cracker import Ui_Form
 from utils import showErrorInfoBar, is_bin
@@ -17,7 +20,7 @@ class Cracker(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        self.resize(330, 530)
+        self.resize(500, 530)
 
         self.ui.sBox_Pairs.setValue(1)
         self.ui.TableWidget_Pairs.setWordWrap(False)
@@ -45,8 +48,8 @@ class Cracker(QWidget):
             item = self.ui.TableWidget_Pairs.item(row, column_index)
             if item is not None:
                 text = item.text()
-                values = [int(char) for char in text]  # 将单元格文本分割为单独的数字
-                column_data.append(values)
+                # values = [int(char) for char in text]  # 将单元格文本分割为单独的数字
+                column_data.append(text)
         return column_data
 
     def crack(self):
@@ -58,29 +61,39 @@ class Cracker(QWidget):
                     showErrorInfoBar(self, '明密文对不完整，请确认')
                     self.ui.IndeterminateProgressBar.setVisible(False)
                     return
-                if len(item.text()) != 8 or not is_bin(item.text()):
-                    showErrorInfoBar(self, '不是整数个Byte，请查证后再输入')
+                if len(item.text()) != 16 or not is_bin(item.text()):
+                    showErrorInfoBar(self, '不是16-bit，请查证后再输入')
                     self.ui.IndeterminateProgressBar.setVisible(False)
                     return
         self.ui.TableWidget_Keys.clearContents()
         self.ui.IndeterminateProgressBar.setVisible(True)
         plain_data = self.get_column_data(0)
+        print(plain_data)
         cypher_data = self.get_column_data(1)
-        keys, duration = main_brute_force_attack(self.ui.TableWidget_Pairs.rowCount(), plain_data, cypher_data)
+        print(cypher_data)
+        start = time.time()
+        M = meet_in_the_middle_attack(plain_data, cypher_data)
+        keys = M.brute_force()
+        end = time.time()
         print(keys)
         if len(keys) == 0:
             showErrorInfoBar(self, '未找到可能的密钥')
         if len(keys) > 4:
             self.ui.TableWidget_Keys.setRowCount(len(keys))
+        # for row, row_data in enumerate(keys):
+        #     data_str = ''.join(map(str, row_data))  # 将每行数据转换为字符串并连接在一起
+        #     item = QTableWidgetItem(data_str)
+        #     self.ui.TableWidget_Keys.setItem(row, 0, item)
         for row, row_data in enumerate(keys):
-            data_str = ''.join(map(str, row_data))  # 将每行数据转换为字符串并连接在一起
-            item = QTableWidgetItem(data_str)
+            data_str = [''.join(map(str, row_data[0])), ''.join(map(str, row_data[1]))]
+            formatted_data = f"[{data_str[0]}, {data_str[1]}]"
+            item = QTableWidgetItem(formatted_data)
             self.ui.TableWidget_Keys.setItem(row, 0, item)
         TeachingTip.create(
             target=self.ui.ppBtn_Crack,
             icon=InfoBarIcon.SUCCESS,
             title='计时器',
-            content=f'暴力破解耗时：{duration}',
+            content=f'暴力破解耗时：{end - start}',
             isClosable=True,
             tailPosition=TeachingTipTailPosition.TOP,
             duration=5000,
