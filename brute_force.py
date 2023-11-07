@@ -35,7 +35,7 @@ class meet_in_the_middle_attack:
                 if j == len(self.pairs) - 1:
                     print("ok")
                 if S1.encrypt(self.plaintext[i]) == S2.decrypt(self.cypertext[i]):
-                    copy.append(self.pairs[i])
+                    copy.append(self.pairs[j])
                     print(S1.encrypt(self.plaintext[i]), S2.decrypt(self.cypertext[i]))
                     continue
                 else:
